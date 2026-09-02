@@ -1,0 +1,34 @@
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: conference_rooms
+      POSTGRES_USER: conference_app
+      POSTGRES_PASSWORD: conference_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - conference_rooms_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conference_app -d conference_rooms"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE: "false"
+      ConnectionStrings__Database: Host=database;Port=5432;Database=conference_rooms;Username=conference_app;Password=conference_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  conference_rooms_data:

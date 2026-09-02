@@ -1,0 +1,47 @@
+@host = http://localhost:5080
+@hallId = replace-with-hall-id
+@serviceId = replace-with-service-id
+@bookingId = replace-with-booking-id
+
+GET {{host}}/health
+
+### List seeded halls
+GET {{host}}/api/halls
+Accept: application/json
+
+### Find available halls
+GET {{host}}/api/halls/available?from=2026-09-10T10:00:00%2B03:00&to=2026-09-10T14:00:00%2B03:00&capacity=50
+Accept: application/json
+
+### Create a hall
+POST {{host}}/api/halls
+Content-Type: application/json
+
+{
+  "name": "Hall D",
+  "capacity": 40,
+  "baseHourlyRate": 1800,
+  "services": [
+    { "name": "Projector", "price": 500 },
+    { "name": "Wi-Fi", "price": 300 }
+  ]
+}
+
+### Create a booking
+POST {{host}}/api/bookings
+Content-Type: application/json
+
+{
+  "hallId": "{{hallId}}",
+  "startAt": "2026-09-10T10:00:00+03:00",
+  "endAt": "2026-09-10T14:00:00+03:00",
+  "serviceIds": ["{{serviceId}}"]
+}
+
+### Get a booking
+GET {{host}}/api/bookings/{{bookingId}}
+Accept: application/json
+
+### Revenue report
+GET {{host}}/api/reports/revenue?from=2026-09-01T00:00:00Z&to=2026-10-01T00:00:00Z
+Accept: application/json
